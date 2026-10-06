@@ -44,7 +44,8 @@ brew install --cask emacs-app
 ```
 
 This gives `/Applications/Emacs.app` plus `emacs` / `emacsclient` symlinks in
-`/opt/homebrew/bin`. Pinned to the 31.x line — the config uses `treesit`,
+`/opt/homebrew/bin`. On Ubuntu use the snap (`sudo snap install emacs --classic`),
+which currently tracks 31.x. Pinned to the 31.x line — the config uses `treesit`,
 `fido-vertical-mode` and the bundled eglot, all of which need Emacs 29+, and
 `java-ts-mode` which needs 30+.
 
@@ -90,6 +91,8 @@ Ships with the Xcode command line tools at `/usr/bin/clangd`:
 ```sh
 xcode-select --install
 ```
+
+On Ubuntu: `sudo apt install clangd cmake`.
 
 eglot already knows to launch `clangd` for `c-mode` / `c++-mode`. It needs a
 `compile_commands.json` at the project root to resolve includes — CMake emits
@@ -206,6 +209,10 @@ to 17) rather than whatever SDKMAN currently points at.
 4. Install [nvm](https://github.com/nvm-sh/nvm) and a Node LTS
 5. Clone this repo and run `emacs/install.sh`
 6. Launch Emacs, let ELPA packages install, then `M-x mm/treesit-install-missing`
+
+On Ubuntu, replace steps 1–2 with `sudo apt install clangd cmake git curl zip unzip build-essential`
+and `sudo snap install emacs --classic`; the rest is identical. `install.sh`
+picks the matching kotlin-lsp archive for the OS and CPU.
 
 Steps 3 and 4 are only needed for the Java/Kotlin and JS/TS setups
 respectively — `install.sh` warns and skips rather than failing if they are

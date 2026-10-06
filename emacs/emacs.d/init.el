@@ -307,3 +307,4 @@
 (global-set-key (kbd "C-c m l") 'magit-log)
 
 (load custom-file t)
+

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Bootstrap the Emacs setup on a fresh macOS machine.
+# Bootstrap the Emacs setup on a fresh macOS or Linux (Ubuntu) machine.
 #
 # Idempotent: every step checks for what it installs and skips if present.
 # Re-run it after pulling this repo to pick up anything new.
@@ -24,17 +24,23 @@ warn() { printf '    \033[33m!\033[0m %s\n' "$*"; }
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
+OS="$(uname -s)"
+ARCH="$(uname -m)"
+
 # ---------------------------------------------------------------------------
 # Emacs
 # ---------------------------------------------------------------------------
 
 info "Emacs"
-if [[ -d /Applications/Emacs.app ]]; then
+if [[ -d /Applications/Emacs.app ]] || have emacs; then
     ok "already installed ($(emacs --version 2>/dev/null | head -1))"
-elif have brew; then
+elif [[ "$OS" == Darwin ]] && have brew; then
     brew install --cask emacs-app
-else
+elif [[ "$OS" == Darwin ]]; then
     warn "Homebrew not found — install it from https://brew.sh then re-run"
+    exit 1
+else
+    warn "not found — run: sudo snap install emacs --classic   (then re-run)"
     exit 1
 fi
 
@@ -61,14 +67,17 @@ for file in init.el custom.el; do
 done
 
 # ---------------------------------------------------------------------------
-# C / C++ — clangd ships with the Xcode command line tools
+# C / C++ — clangd ships with the Xcode command line tools on macOS,
+# and comes from apt on Linux
 # ---------------------------------------------------------------------------
 
 info "clangd (C/C++)"
 if have clangd; then
     ok "$(command -v clangd)"
-else
+elif [[ "$OS" == Darwin ]]; then
     warn "not found — run: xcode-select --install"
+else
+    warn "not found — run: sudo apt install clangd cmake"
 fi
 
 # ---------------------------------------------------------------------------
@@ -109,17 +118,38 @@ info "kotlin-lsp (Kotlin)"
 if [[ -x "$LOCAL_SHARE/kotlin-lsp/bin/intellij-server" ]]; then
     ok "already installed (build $(cat "$LOCAL_SHARE/kotlin-lsp/build.txt" 2>/dev/null))"
 else
-    asset="$(curl -fsSL https://api.github.com/repos/Kotlin/kotlin-lsp/releases/latest \
-             | grep -o 'https://[^"]*\.zip' | head -1 || true)"
+    # The GitHub release has no binary assets; the standalone archives are
+    # linked from the release notes, one per platform.
+    case "$OS-$ARCH" in
+        Darwin-arm64)  pattern='kotlin-server-[0-9.]*-aarch64\.sit' ;;
+        Darwin-x86_64) pattern='kotlin-server-[0-9.]*\.sit' ;;
+        Linux-aarch64) pattern='kotlin-server-[0-9.]*-aarch64\.tar\.gz' ;;
+        Linux-x86_64)  pattern='kotlin-server-[0-9.]*\.tar\.gz' ;;
+        *)             pattern='' ;;
+    esac
+    asset=""
+    if [[ -n "$pattern" ]]; then
+        asset="$(curl -fsSL https://api.github.com/repos/Kotlin/kotlin-lsp/releases/latest \
+                 | grep -o "https://download\.jetbrains\.com/[^)\"]*/$pattern" | head -1 || true)"
+    fi
     if [[ -z "$asset" ]]; then
         warn "could not resolve a release asset — download manually from"
         warn "https://github.com/Kotlin/kotlin-lsp/releases into $LOCAL_SHARE/kotlin-lsp"
     else
         mkdir -p "$LOCAL_SHARE/kotlin-lsp" "$LOCAL_BIN"
         tmp="$(mktemp -d)"
-        curl -fsSL "$asset" -o "$tmp/kotlin-lsp.zip"
-        unzip -q "$tmp/kotlin-lsp.zip" -d "$LOCAL_SHARE/kotlin-lsp"
+        curl -fsSL "$asset" -o "$tmp/kotlin-lsp.archive"
+        if [[ "$asset" == *.tar.gz ]]; then
+            tar -xzf "$tmp/kotlin-lsp.archive" -C "$LOCAL_SHARE/kotlin-lsp"
+        else
+            unzip -q "$tmp/kotlin-lsp.archive" -d "$LOCAL_SHARE/kotlin-lsp"
+        fi
         rm -rf "$tmp"
+        # Archives may wrap everything in a single top-level directory.
+        if [[ ! -e "$LOCAL_SHARE/kotlin-lsp/bin" ]]; then
+            inner="$(find "$LOCAL_SHARE/kotlin-lsp" -mindepth 2 -maxdepth 2 -type d -name bin | head -1)"
+            [[ -n "$inner" ]] && { shopt -s dotglob; mv "$(dirname "$inner")"/* "$LOCAL_SHARE/kotlin-lsp/"; rmdir "$(dirname "$inner")"; shopt -u dotglob; }
+        fi
         chmod +x "$LOCAL_SHARE/kotlin-lsp/bin/intellij-server"
         ln -sf "$LOCAL_SHARE/kotlin-lsp/bin/intellij-server" "$LOCAL_BIN/kotlin-lsp"
         ok "installed to $LOCAL_SHARE/kotlin-lsp"

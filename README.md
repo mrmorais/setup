@@ -16,5 +16,6 @@ README describing what it is and how to install it from scratch.
   change is never lost and `git status` always shows drift.
 - Every `install.sh` is idempotent: re-running it on an already-configured
   machine is a no-op plus any missing pieces.
-- Target platform is macOS on Apple Silicon with Homebrew. Steps that are
-  macOS-specific are called out in the component README.
+- Primary target is macOS on Apple Silicon with Homebrew; Ubuntu (x86_64 /
+  arm64) is also supported. Platform-specific steps are called out in the
+  component README.
