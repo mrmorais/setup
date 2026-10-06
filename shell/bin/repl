@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+set -u
+set -o history
+
+if (( $# == 0 )); then
+    echo "usage: repl <command> [base args...]"
+    exit 1
+fi
+
+base=("$@")
+name="${base[0]##*/}"
+
+# XDG-compliant state dir
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/repl"
+mkdir -p "$state_dir"
+
+history_file="$state_dir/${name}.history"
+
+# Load previous REPL history
+touch "$history_file"
+history -r "$history_file"
+
+while true; do
+    IFS= read -e -r -p "$name> " line || {
+        echo
+        break
+    }
+
+    case "$line" in
+        "")
+            continue
+            ;;
+        exit|quit|:q)
+            break
+            ;;
+    esac
+
+    # Add to readline history so ↑ immediately works
+    history -s "$line"
+
+    # Persist for future repl sessions
+    printf '%s\n' "$line" >> "$history_file"
+
+    printf -v prefix '%q ' "${base[@]}"
+    eval "$prefix$line"
+done
