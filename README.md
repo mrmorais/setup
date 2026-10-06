@@ -9,6 +9,7 @@ README describing what it is and how to install it from scratch.
 |---|---|
 | [`emacs/`](emacs/) | GNU Emacs 31 config — eglot/LSP for C/C++, Java, Kotlin, JS/TS, plus CMake and Gradle build commands |
 | [`claude/`](claude/) | Claude Code — global instructions, settings, MCP servers, plugins, and the skill library |
+| [`shell/`](shell/) | Command-line helpers kept on PATH — `repl`, which turns any command into a REPL |
 
 ## Conventions
 
