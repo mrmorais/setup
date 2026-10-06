@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(agent-browser snapshot:*)",
+      "Bash(agent-browser:*)",
+      "Skill(agent-browser)",
+      "Bash(obsidian-cli read:*)",
+      "mcp__datadog-mcp__search_datadog_logs",
+      "mcp__datadog-mcp__get_datadog_metric",
+      "mcp__datadog-mcp__search_datadog_service_dependencies",
+      "mcp__datadog-mcp__get_datadog_dashboard",
+      "mcp__datadog-mcp__aggregate_spans",
+      "mcp__datadog-mcp__search_datadog_spans",
+      "mcp__datadog-mcp__get_datadog_trace"
+    ]
+  }
+}

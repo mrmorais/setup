@@ -1,0 +1,57 @@
+{
+  "mcpServers": {
+    "circleci-mcp-server": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@circleci/mcp-server-circleci@latest"
+      ],
+      "env": {
+        "CIRCLECI_TOKEN": "${CIRCLECI_TOKEN}"
+      }
+    },
+    "chrome-devtools": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "chrome-devtools-mcp@latest"
+      ],
+      "env": {}
+    },
+    "figma-local": {
+      "type": "http",
+      "url": "http://127.0.0.1:3845/mcp"
+    },
+    "instances-mcp": {
+      "type": "http",
+      "url": "https://instances-mcp.vantage.sh/mcp/${INSTANCES_MCP_ENDPOINT_ID}"
+    },
+    "datadog-mcp": {
+      "type": "http",
+      "url": "https://mcp.datadoghq.com/api/unstable/mcp-server/mcp?toolsets=core,alerting"
+    },
+    "pencil": {
+      "command": "/Applications/Pen.app/Contents/Resources/app.asar.unpacked/out/mcp-server-darwin-arm64",
+      "args": [
+        "--app",
+        "desktop",
+        "--agent",
+        "claudeCodeCLI"
+      ],
+      "env": {},
+      "type": "stdio"
+    },
+    "carpedia": {
+      "type": "http",
+      "url": "https://www.carpedia.com.br/api/mcp",
+      "headers": {
+        "Authorization": "${CARPEDIA_AUTHORIZATION}"
+      }
+    },
+    "mixpanel": {
+      "type": "http",
+      "url": "https://mcp.mixpanel.com/mcp"
+    }
+  }
+}

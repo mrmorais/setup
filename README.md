@@ -8,6 +8,7 @@ README describing what it is and how to install it from scratch.
 | Directory | What it covers |
 |---|---|
 | [`emacs/`](emacs/) | GNU Emacs 31 config — eglot/LSP for C/C++, Java, Kotlin, JS/TS, plus CMake and Gradle build commands |
+| [`claude/`](claude/) | Claude Code — global instructions, settings, MCP servers, plugins, and the skill library |
 
 ## Conventions
 
@@ -16,6 +17,11 @@ README describing what it is and how to install it from scratch.
   change is never lost and `git status` always shows drift.
 - Every `install.sh` is idempotent: re-running it on an already-configured
   machine is a no-op plus any missing pieces.
-- Primary target is macOS on Apple Silicon with Homebrew; Ubuntu (x86_64 /
-  arm64) is also supported. Platform-specific steps are called out in the
-  component README.
+- Target platform is macOS on Apple Silicon with Homebrew. Steps that are
+  macOS-specific are called out in the component README.
+- **This repo is public.** Nothing work-related is published here — no internal
+  skills, plugins, marketplaces, endpoints or identifiers — and no credentials.
+  Config that would otherwise carry a secret is committed as a template with
+  `${PLACEHOLDER}` values. Files that a tool rewrites on its own are copied
+  rather than symlinked, so private state cannot leak back in through an edit.
+
