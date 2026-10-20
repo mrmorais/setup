@@ -52,6 +52,8 @@
 (setq confirm-kill-emacs 'y-or-n-p)
 (setq warning-suppress-log-types '((files missing-lexbind-cookie)))
 
+(winner-mode 1)
+
 ;;; ---------------------------------------------------------------------------
 ;;; Minibuffer completion
 ;;; ---------------------------------------------------------------------------
